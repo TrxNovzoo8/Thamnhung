@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nhận diện hành vi tham nhũng và vai trò của sinh viên - ĐHKT Đà Nẵng</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --paper-bg: #ffffff;
+            --text-main: #2b2d42;
+            --text-muted: #6c757d;
+            --brand-red: #bb2d3b;
+            --brand-dark: #1a1a1a;
+            --accent-blue: #0d6efd;
+            --border-color: #e9ecef;
+            --sidebar-bg: #ffffff;
+            --font-serif: 'Merriweather', Georgia, serif;
+            --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            line-height: 1.8;
+            font-size: 17px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Reading Progress Bar */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: transparent;
+            z-index: 1000;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--brand-red);
+            width: 0%;
+            transition: width 0.1s ease-out;
+        }
+
+        /* Header Bar */
+        .top-header {
+            background-color: var(--brand-dark);
+            color: #ffffff;
+            padding: 10px 0;
+            border-bottom: 3px solid var(--brand-red);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .university-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #f8f9fa;
+        }
+
+        .article-category {
+            font-size: 0.8rem;
+            background-color: var(--brand-red);
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Main Layout */
+        .page-wrapper {
+            max-width: 1280px;
+            margin: 30px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        /* LEFT SIDEBAR: Table of Contents */
+        .sidebar-left {
+            position: sticky;
+            top: 20px;
+            background: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+
+        .toc-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--brand-red);
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--brand-red);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-item {
+            margin-bottom: 10px;
+        }
+
+        .toc-link {
+            color: #495057;
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 500;
+            display: block;
+            padding: 6px 10px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            line-height: 1.4;
+        }
+
+        .toc-link:hover {
+            background-color: #f1f3f5;
+            color: var(--brand-red);
+            padding-left: 14px;
+        }
+
+        /* RIGHT CONTENT AREA */
+        .main-article {
+            background-color: var(--paper-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 50px 60px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+        }
+
+        /* Article Header */
+        .article-header {
+            margin-bottom: 35px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .main-title {
+            font-family: var(--font-serif);
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--brand-dark);
+            line-height: 1.3;
+            margin-bottom: 20px;
+        }
+
+        /* Compact Meta / Contact Line */
+        .article-meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 15px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background-color: #f8f9fa;
+            padding: 10px 16px;
+            border-radius: 6px;
+            border-left: 3px solid var(--accent-blue);
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .meta-item strong {
+            color: var(--text-main);
+        }
+
+        .contact-email {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        .contact-email:hover {
+            text-decoration: underline;
+        }
+
+        /* Article Content Styling */
+        .content-body {
+            font-family: var(--font-serif);
+            color: #2b2b2b;
+            font-size: 1.05rem;
+        }
+
+        .content-body h2 {
+            font-family: var(--font-sans);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--brand-dark);
+            margin: 40px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--text-main);
+            scroll-margin-top: 30px;
+        }
+
+        .content-body h3 {
+            font-family: var(--font-sans);
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--brand-red);
+            margin: 25px 0 10px 0;
+            scroll-margin-top: 30px;
+        }
+
+        .content-body p {
+            margin-bottom: 18px;
+            text-align: justify;
+        }
+
+        .content-body ul {
+            margin: 0 0 20px 25px;
+        }
+
+        .content-body li {
+            margin-bottom: 8px;
+            text-align: justify;
+        }
+
+        .law-quote {
+            background-color: #f1f5f9;
+            border-left: 4px solid var(--brand-red);
+            padding: 15px 20px;
+            margin: 20px 0;
+            font-style: italic;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.98rem;
+        }
+
+        /* References Section */
+        .references-list {
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            padding-left: 20px;
+        }
+
+        .references-list li {
+            margin-bottom: 10px;
+            word-break: break-all;
+        }
+
+        .references-list a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        .references-list a:hover {
+            text-decoration: underline;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 50px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .page-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar-left {
+                position: relative;
+                top: 0;
+                max-height: none;
+            }
+
+            .main-article {
+                padding: 30px 25px;
+            }
+
+            .main-title {
+                font-size: 1.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="top-header">
+        <div class="header-container">
+            <div class="university-name">Đại học Kinh tế Đà Nẵng</div>
+            <div class="article-category">Pháp luật đại cương</div>
+        </div>
+    </header>
+
+    <!-- Page Wrapper -->
+    <div class="page-wrapper">
+        
+        <!-- LEFT SIDEBAR: Table of Contents -->
+        <aside class="sidebar-left">
+            <div class="toc-title">
+                <span>MỤC LỤC BÀI VIẾT</span>
+            </div>
+            <ul class="toc-list">
+                <li class="toc-item"><a href="#sec-1" class="toc-link">I. Khái niệm, đặc điểm & hành vi tham nhũng</a></li>
+                <li class="toc-item"><a href="#sec-2" class="toc-link">II. Nguyên nhân và hậu quả của tham nhũng</a></li>
+                <li class="toc-item"><a href="#sec-3" class="toc-link">III. Tầm quan trọng của công tác PCTN</a></li>
+                <li class="toc-item"><a href="#sec-4" class="toc-link">IV. Trách nhiệm của sinh viên trong PCTN</a></li>
+                <li class="toc-item"><a href="#sec-5" class="toc-link">V. Tài liệu tham khảo</a></li>
+            </ul>
+        </aside>
+
+        <!-- RIGHT CONTENT AREA -->
+        <main class="main-article">
+            
+            <article>
+                <header class="article-header">
+                    <h1 class="main-title">Nhận diện các hành vi tham nhũng và vai trò của sinh viên trong phòng chống tham nhũng</h1>
+                    
+                    <!-- Compact Meta & Contact Line -->
+                    <div class="article-meta">
+                        <span class="meta-item"><strong>Môn học:</strong> Pháp luật đại cương</span>
+                        <span class="meta-item">•</span>
+                        <span class="meta-item"><strong>Đơn vị:</strong> Khoa Kế toán - Ngành Kiểm toán</span>
+                        <span class="meta-item">•</span>
+                        <span class="meta-item"><strong>Liên hệ:</strong> <a href="mailto:contact@due.edu.vn" class="contact-email">contact@due.edu.vn</a></span>
+                    </div>
+                </header>
+
+                <div class="content-body">
+                    
+                    <!-- SECTION I -->
+                    <section id="sec-1">
+                        <h2>I. KHÁI NIỆM, ĐẶC ĐIỂM VÀ CÁC HÀNH VI THAM NHŨNG</h2>
+                        
+                        <h3>1.1. Khái niệm tham nhũng</h3>
+                        <div class="law-quote">
+                            Theo khoản 1 Điều 3 Luật Phòng, chống tham nhũng năm 2018, tham nhũng là hành vi của người có chức vụ, quyền hạn đã lợi dụng chức vụ, quyền hạn đó vì vụ lợi.
+                        </div>
+                        <p>Từ quy định trên, có thể hiểu tham nhũng là hành vi lợi dụng vị trí công tác, quyền hạn được giao để đạt được lợi ích không chính đáng cho bản thân hoặc cho người khác. Đây là hành vi xâm phạm tính đúng đắn trong hoạt động của cơ quan, tổ chức, làm suy giảm niềm tin của nhân dân, gây thiệt hại đến lợi ích của Nhà nước, tổ chức và cá nhân, đồng thời cản trở sự phát triển kinh tế – xã hội.</p>
+
+                        <h3>1.2. Đặc điểm của tham nhũng</h3>
+                        <p><strong>1.2.1. Chủ thể thực hiện hành vi tham nhũng là người có chức vụ, quyền hạn:</strong> Nhóm chủ thể này bao gồm cán bộ, công chức, viên chức, sĩ quan, quân nhân chuyên nghiệp, người quản lý trong doanh nghiệp và những người khác được giao thực hiện nhiệm vụ, công vụ hoặc có quyền hạn theo quy định pháp luật.</p>
+                        <p><strong>1.2.2. Chủ thể lợi dụng chức vụ, quyền hạn được giao:</strong> Lợi dụng chức vụ, quyền hạn để thực hiện hành vi trái pháp luật hoặc làm sai lệch việc thực hiện nhiệm vụ nhằm đạt được lợi ích không chính đáng.</p>
+                        <p><strong>1.2.3. Động cơ của hành vi tham nhũng là vụ lợi:</strong> Vụ lợi là việc cán bộ, công chức, viên chức lợi dụng chức vụ, quyền hạn nhằm đạt được lợi ích vật chất hoặc lợi ích phi vật chất không chính đáng.</p>
+
+                        <h3>1.3. Các hành vi tham nhũng</h3>
+                        <p><strong>1.3.1. Trong khu vực nhà nước:</strong> Tham ô tài sản; Nhận hối lộ; Lạm dụng chức vụ, quyền hạn chiếm đoạt tài sản; Lợi dụng chức vụ, quyền hạn trong khi thi hành nhiệm vụ, công vụ vì vụ lợi; Giả mạo trong công tác vì vụ lợi;... (theo Điều 2 Luật Phòng, chống tham nhũng 2018).</p>
+                        <p><strong>1.3.2. Trong khu vực ngoài nhà nước:</strong> Tham ô tài sản; Nhận hối lộ; Đưa hối lộ, môi giới hối lộ để giải quyết công việc của doanh nghiệp, tổ chức mình vì vụ lợi.</p>
+                    </section>
+
+                    <!-- SECTION II -->
+                    <section id="sec-2">
+                        <h2>II. NGUYÊN NHÂN VÀ HẬU QUẢ CỦA THAM NHŨNG</h2>
+                        
+                        <h3>2.1. Nguyên nhân tham nhũng</h3>
+                        <ul>
+                            <li><strong>Hạn chế về thể chế và pháp luật:</strong> Hệ thống pháp luật chưa chặt chẽ, còn tồn tại nhiều "khe hở" và thiếu tính minh bạch.</li>
+                            <li><strong>Bất cập trong quản lý nhà nước & kiểm soát quyền lực:</strong> Phân cấp, phân quyền chưa đi kèm kiểm soát quyền lực hiệu quả, dễ phát sinh "lợi ích nhóm".</li>
+                            <li><strong>Yếu tố cán bộ & chế độ đãi ngộ:</strong> Sự suy thoái đạo đức công vụ; chế độ tiền lương chưa bảo đảm nhu cầu cuộc sống tối thiểu.</li>
+                            <li><strong>Tác động văn hóa - xã hội & giáo dục:</strong> Thói quen tặng quà bị biến tướng thành trao đổi lợi ích. Chương trình giáo dục thiếu trọng tâm về đạo đức công chức.</li>
+                        </ul>
+
+                        <h3>2.2. Hậu quả</h3>
+                        <p><strong>Tác hại về chính trị:</strong> Vô hiệu hóa chính sách, làm xói mòn lòng tin của Nhân dân vào Đảng và Nhà nước, làm tha hóa bộ máy chính quyền.</p>
+                        <p><strong>Tác hại về kinh tế:</strong> Thất thoát hàng ngàn tỷ đồng tài sản công, tăng chi phí ngầm cho doanh nghiệp (từ 10-25%), gây lãng phí nguồn lực quốc gia.</p>
+                        <p><strong>Tác hại về xã hội:</strong> Xói mòn đạo đức xã hội, gia tăng bất bình đẳng, triệt tiêu động lực cống hiến của người tài và gây ảnh hưởng nặng nề đến y tế, giáo dục.</p>
+                    </section>
+
+                    <!-- SECTION III -->
+                    <section id="sec-3">
+                        <h2>III. TẦM QUAN TRỌNG CỦA CÔNG TÁC PHÒNG, CHỐNG THAM NHŨNG</h2>
+                        <p><strong>3.1. Bảo vệ chế độ, xây dựng Nhà nước pháp quyền:</strong> Ngăn ngừa nguy cơ suy thoái bộ máy, củng cố trật tự pháp luật và nâng cao uy tín quốc tế.</p>
+                        <p><strong>3.2. Thúc đẩy tăng trưởng kinh tế bền vững:</strong> Khơi thông nguồn lực phát triển, tạo lập môi trường đầu tư kinh doanh bình đẳng, thu hẹp khoảng cách giàu - nghèo.</p>
+                        <p><strong>3.3. Duy trì giá trị đạo đức truyền thống:</strong> Đẩy lùi suy thoái lối sống, đề cao đạo đức công vụ và phục hồi niềm tin trong các lĩnh vực y tế, giáo dục.</p>
+                        <p><strong>3.4. Củng cố niềm tin của Nhân dân:</strong> Phát huy triết lý "Lấy dân làm gốc" và huy động sức mạnh đại đoàn kết toàn dân trong bảo vệ pháp luật.</p>
+                    </section>
+
+                    <!-- SECTION IV -->
+                    <section id="sec-4">
+                        <h2>IV. TRÁCH NHIỆM CỦA SINH VIÊN TRONG CÔNG TÁC PHÒNG, CHỐNG THAM NHŨNG</h2>
+                        <p>Sinh viên là lực lượng trí thức trẻ, có vai trò quan trọng trong việc nâng cao nhận thức pháp luật, xây dựng văn hóa liêm chính và phòng ngừa tham nhũng:</p>
+                        <ul>
+                            <li><strong>Nâng cao nhận thức:</strong> Tự giác tìm hiểu, chấp hành quy định pháp luật về phòng, chống tham nhũng (Điều 5 Luật PCTN 2018).</li>
+                            <li><strong>Rèn luyện đạo đức liêm chính:</strong> Trung thực trong thi cử, không gian lận nghiên cứu, không chạy điểm hay tác động tiêu cực trong học đường.</li>
+                            <li><strong>Phát hiện và phản ánh:</strong> Chủ động tố giác, phản ánh các hành vi vi phạm đến cơ quan có thẩm quyền với thông tin trung thực, khách quan.</li>
+                            <li><strong>Tuyên truyền & Xây dựng môi trường minh bạch:</strong> Tích cực tham gia các hoạt động tuyên truyền, góp ý xây dựng môi trường giáo dục dân chủ.</li>
+                            <li><strong>Phát huy trách nhiệm công dân:</strong> Thực hiện quyền giám sát xã hội, sử dụng mạng xã hội có trách nhiệm và lan tỏa tinh thần thượng tôn pháp luật.</li>
+                        </ul>
+                    </section>
+
+                    <!-- SECTION V -->
+                    <section id="sec-5">
+                        <h2>V. TÀI LIỆU THAM KHẢO</h2>
+                        <ol class="references-list">
+                            <li>Quốc hội. (2018). <em>Luật Phòng, chống tham nhũng số 36/2018/QH14</em> ngày 20 tháng 11 năm 2018.</li>
+                            <li>Lê, T. T. H. (Chủ biên). (2019). <em>Giáo trình pháp luật đại cương</em> (Dùng cho hệ đào tạo đại học không chuyên ngành luật).</li>
+                            <li>Doãn, H. N., & Cung, P. T. P. <em>Một số ý kiến về nguyên nhân tham nhũng, tiêu cực trong cơ quan thanh tra nhà nước ở Việt Nam hiện nay</em>. Tạp chí Công Thương.</li>
+                            <li>Luật sư Việt Nam. (2025). <em>Từ những đại án – Gạn đục khơi trong để giữ vững niềm tin</em>.</li>
+                            <li>Sài Gòn Giải Phóng. (2023). <em>Vụ án Công ty Việt Á: Hàng loạt cựu lãnh đạo nhận hối lộ</em>.</li>
+                        </ol>
+                    </section>
+
+                </div>
+            </article>
+
+            <footer>
+                <p>© 2026 Đại học Kinh tế Đà Nẵng - Môn Pháp luật đại cương</p>
+            </footer>
+
+        </main>
+    </div>
+
+    <!-- Script update progress bar -->
+    <script>
+        window.onscroll = function() {
+            var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            var scrolled = (winScroll / height) * 100;
+            document.getElementById("progressBar").style.width = scrolled + "%";
+        };
+    </script>
+</body>
+</html>
